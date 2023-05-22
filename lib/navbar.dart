@@ -1,6 +1,8 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:step3/screens/daily_avarage.dart';
 import 'package:step3/screens/home_screen.dart';
+import 'package:step3/screens/search_page.dart';
 
 import 'constant.dart';
 
@@ -15,8 +17,8 @@ class _NavbarState extends State<Navbar> {
   int _pageIndex = 0;
   final List<Widget> _tabList = [
     HomeScreen(),
-    Text('Home page'),
-    Text('Home page'),
+    Searchpage(),
+    DailyAverage(),
     Text('Home page'),
   ];
 

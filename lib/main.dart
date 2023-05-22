@@ -22,10 +22,12 @@
 //@dart=2.9
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:step3/navbar.dart';
 import 'package:step3/utils/shared_preferences_theme.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +59,46 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handlePermission();
+
+    if (!hasPermission) {
+      return;
+    }
+
+    final position = await _geolocatorPlatform.getCurrentPosition();
+    print('GOT');
+    print(position.latitude);
+    LAT = position.latitude.toString();
+    LONG = position.longitude.toString();
+    return position;
+  }
+
+  Future<bool> _handlePermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+    permission = await _geolocatorPlatform.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await _geolocatorPlatform.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return false;
+    }
+
+    return true;
+  }
+
   Widget build(BuildContext context) {
+    _getCurrentPosition();
     return Consumer<ThemeProvider>(builder: (context, value, child) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -68,3 +109,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 }
+
+String LAT = '';
+String LONG = '';
